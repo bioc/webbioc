@@ -1,0 +1,239 @@
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+%\VignetteIndexEntry{webbioc Overview}
+%\VignetteDepends{}
+%\VignetteKeywords{web, interface, perl}
+%\VignettePackage{webbioc}
+\documentclass[12pt]{article}
+
+\usepackage{hyperref}
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+\begin{document}
+\title{Textual Description of webbioc}
+\author{Colin A. Smith}
+\maketitle
+
+\section*{Introduction}
+
+\verb+webbioc+ is a web interface for some of the Bioconductor
+microarray analysis packages. It is designed to be installed at
+local sites as a shared bioinformatics resource. Unfortunately,
+\verb+webbioc+ currently provides only Affymetrix-based analysis.
+(We would certainly like to collaborate with someone interested in
+creating a cDNA module.) The existing modules provide a workflow
+that takes users from CEL files to differential expression with
+multiple hypothesis testing control, and finally to metadata
+annotation of the gene lists.
+
+\section{User Interface Goals}
+
+This package aims to address a number of issues facing prospective
+users:
+
+\begin{itemize}
+
+\item {\it Ease of use.} Using the web interface, the user does
+not need to know how to use either a command line interface or the
+R language.  Depending on the computer savvy of the user, R tends
+to have a somewhat steep learning curve. \verb+webbioc+ has a very
+short learning curve and should be usable by any biologist.
+
+\item {\it Ease of installation.} After an initial installation by
+a system administrator, there is no need to install additional
+software on user computers. Installing and maintaining an R
+installation with all the Bioconductor packages can be a daunting
+task, often best suited to a system administrator. Using \verb+webbioc+,
+only one such installation needs to be maintained.
+
+\item {\it Discoverability.} Graphical user interfaces are
+significantly more discoverable than command line interfaces. That
+is, a user browsing around a software package is much more likely
+to discover and use new features if they are graphically presented.
+Additionally, a unified user interface for the different Bioconductor
+packages can help show how they can be used together in a
+data-processing pipeline. Ideally, a user should be able to start
+using the web interface without reading external documentation.
+
+\item {\it Documentation.} Embedding context-sensitive online help
+into the interface helps first-time users make good decisions about
+which statistical approaches to take. Because of its power,
+Bioconductor includes a myriad of options for analysis. Helping
+the novice statistician wade through that pool of choices is an
+important aspect of \verb+webbioc+.
+
+\end{itemize}
+
+\section{Architecture}
+
+\verb+webbioc+ is written in a combination of Perl, R, and shell
+scripts.  For most processing, the Perl-driven web interface
+dynamically creates an R script, which is processed in batch mode.
+A shell script controls the execution of R and catches any errors
+that result.
+
+The web interface can be configured to execute the shell script in
+one of two ways. In the single-machine configuration, Perl forks
+off an auxiliary thread which then runs the script. However,
+\verb+webbioc+ can also be configured to use PBS (Portable Batch
+System) to send the job to another computer for processing.
+
+If used in a cluster configuration, \verb+webbioc+ depends on having
+a shared partition between the web server and all the compute nodes.
+This is typically accomplished with NFS. The shared partition allows
+the compute nodes to push results directly out to the user without
+directly interacting with the web server.
+
+Microarray analysis is very data intensive and tends to produce
+large files. Thus special care must be taken to efficiently move
+that data back and forth between the web-client and the server.
+\verb+webbioc+ uses two different systems for exchanging data with
+the client, one for input and the other for output.
+
+The Upload Manager handles all files to be processed by Bioconductor.
+When users start a session with the upload manager, they are granted
+a unique token that identifies the session. Using that short random
+string of letters and numbers, they may access their uploaded files
+from any of the Bioconductor tools. In that way, users must only
+upload files a single time. Upload manager sessions are meant to
+be temporary, with any files being automatically deleted after a
+given amount of time.
+
+For output of results, \verb+webbioc+ creates static HTML pages on
+the fly that contain relevant images or files. Like the upload
+manager, job results are uniquely identified and are only temporarily
+stored.  Because saving old results could potentially fill up the
+disk, those too should be automatically purged on a regular basis.
+
+The results of one job may need to be fed into the input of another.
+For instance, expression summary data created by \verb+affy+ needs
+to be supplied to \verb+multtest+ for detection of differentially
+expressed genes. To facilitate that data exchange, the web interface
+will optionally copy results back to the upload manager for processing
+by other packages.
+
+The data interchange format used by \verb+webbioc+ is the standard
+R data file. By convention, each file contains only one object.
+Additionally, instead of using the common .Rda or .Rdata extensions,
+\verb+webbioc+ will use the class of the stored object as the file
+extension. This provides a useful abstraction that many computer
+users have come to understand and expect. The extensions are merely
+for the benefit of the user as the web interface ignores them.
+
+\section{System Reqirements}
+
+\begin{itemize}
+
+\item {\bf R 1.7.0:} \verb+webbioc+ has only been tested with R
+1.7.0 and later and there is no guarantee that it will work with
+any version earlier than that.
+
+\item {\bf Biobase:} There is a slight conundrum with obtaining a
+version of \verb+Biobase+ that will work. \verb+matchprobes+ depends
+on \verb+Biobase+ 1.3.29, which itself depends on a developmental
+build of R 1.8.0. The author has created a special version of
+\verb+Biobase+ which works with both R 1.7.x and \verb+matchprobes+.
+It can be downloaded at
+\url{http://genome.nasa.gov/downloads/Biobase_1.3.29.tar.gz}.
+
+\item {\bf affy, multtest, annaffy, vsn, gcrma:} \verb+webbioc+
+directly invokes these packages for processing work. Additionally,
+those packages depend on others that are not listed here but must
+also be installed.
+
+\item {\bf Bioconductor metadata packages:} Much of the computation
+done by \verb+affy+, \verb+annaffy+, and \verb+gcrma+ depends on
+prebuilt metadata packages available on the Bioconductor web site.
+We reccommend that all of the metadata packages be installed so
+that users are given the maximum flexibility with which chips they
+may process. Future versions of \verb+webbioc+ should include
+mechanisms for automatically downloading all relevant metadata
+packages.
+
+\item {\bf Unix:} \verb+webbioc+ was written in a Unix environment
+and depends on many Unix conventions including pathnames, directory
+structure, and interprocess communitation. It is doubtful whether
+it will run under Windows and has not been tested as such. However,
+an ambitious person could port \verb+webbioc+ to Windows. The
+community would greatly appreciate such an effort.
+
+\item {\bf Perl 5.6:} Development and testing has been done with
+both Perl 5.6 and 5.8. It will likely work with either. Perl 5.6
+may however require installation of some modules that do not ship
+as part of the default installation. \verb+webbioc+ currently uses
+the following modules: CGI, Digest::MD5, File::stat, IPC::Open3,
+and POSIX.
+
+\item {\bf Netpbm:} The Netpbm series of programs handle graphics
+manipulation. If you install it using RPM's, make sure to install
+both netpbm and netpbmprogs.
+
+\item {\bf PBS:} PBS Pro was used for development. OpenPBS should
+also work although it has not been tested. If you will be using
+PBS, \verb+webbioc+ depends on having a shared filesystem mounted
+in the sampe place on the web server as well as all the compute
+nodes.
+
+\end{itemize}
+
+\section{Installation}
+
+Installing the \verb+webbioc+ files is relatively straightforward.
+First create a directory within the web server's CGI directory that
+will hold all the Perl scripts. One might typically call that
+directory "bioconductor". Copy all the files from 
+/\verb+R lib dir+/webbioc/cgi/ into that directory.
+
+Next verify that the permissions are correct on the copied files.
+Change go to the directory to which you copied the files. Use the
+command \verb+chmod 755 *.cgi+ to make the CGI scripts executable
+and the command \verb+chmod 644 *.pm+ to make the support modules
+readable.
+
+You must decide how you want to link the Bioconductor web interface
+into your existing web site. It was designed to integrate seamlesly
+into an existing site design. \verb+webbioc+ includes a very
+rudimentary home page in /\verb+R lib dir+/webbioc/www/. You may
+either use this as a starting point or create your own. Please note
+that you may have to change the links slightly depending on where
+you place the CGI scripts.
+
+The last step of the installation is to create two directories
+where the web interface can store files. Remember that if using
+PBS, these two directories must be shared between the web server
+and all compute nodes via NFS (or some other file sharing mechanism).
+If other users have access to any of the machines running the web
+interface, we reccommend setting the permisions of these directories
+so that only the web sever user can read them.
+
+The first directory will be for storing uploaded files. The largest 
+type of file uploaded will probably be CEL files. They are typically
+around 10 MB each. Therefore, depending on expected server usage, 
+the directory should be kept on a partition with hundreds of 
+megabytes to gigabytes of free space. It can be stored anywhere 
+and does not necessarily have to be web-accessible. 
+
+The second directory will be used for storing the results of jobs
+that clients submit. Job results will typically be anywhere from
+5 MB to 5 KB. The free space necessary for this directory is again
+subject to usage. This directory must be accessible via the web
+server to allow results to be delivered asynchronously.
+
+Both directories should be regularly purged of old files. In the
+future we hope to provide scripts that will help you do that.
+Until then, you will have to handle that yourself. We would appreciate
+the contribution of any scripts towards that end.
+
+\section{Configuration}
+
+
+
+\end{document}
