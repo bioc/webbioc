@@ -128,7 +128,7 @@ extension. This provides a useful abstraction that many computer
 users have come to understand and expect. The extensions are merely
 for the benefit of the user as the web interface ignores them.
 
-\section{System Reqirements}
+\section{System Requirements}
 
 \begin{itemize}
 
@@ -136,13 +136,14 @@ for the benefit of the user as the web interface ignores them.
 1.7.0 and later and there is no guarantee that it will work with
 any version earlier than that.
 
-\item {\bf Biobase:} There is a slight conundrum with obtaining a
-version of \verb+Biobase+ that will work. \verb+matchprobes+ depends
-on \verb+Biobase+ 1.3.29, which itself depends on a developmental
+\item {\bf Biobase:} Obtaining a version of \verb+Biobase+ that
+will work poses a slight conundrum. \verb+matchprobes+ depends on
+\verb+Biobase+ 1.3.29, which itself depends on a developmental
 build of R 1.8.0. The author has created a special version of
 \verb+Biobase+ which works with both R 1.7.x and \verb+matchprobes+.
-It can be downloaded at
-\url{http://genome.nasa.gov/downloads/Biobase_1.3.29.tar.gz}.
+It can be downloaded at:
+
+\url{http://genome.nasa.gov/downloads/Biobase_1.3.29.tar.gz}
 
 \item {\bf affy, multtest, annaffy, vsn, gcrma:} \verb+webbioc+
 directly invokes these packages for processing work. Additionally,
@@ -151,16 +152,16 @@ also be installed.
 
 \item {\bf Bioconductor metadata packages:} Much of the computation
 done by \verb+affy+, \verb+annaffy+, and \verb+gcrma+ depends on
-prebuilt metadata packages available on the Bioconductor web site.
-We reccommend that all of the metadata packages be installed so
+pre-built metadata packages available on the Bioconductor web site.
+We recommend that all of the metadata packages be installed so
 that users are given the maximum flexibility with which chips they
 may process. Future versions of \verb+webbioc+ should include
 mechanisms for automatically downloading all relevant metadata
 packages.
 
 \item {\bf Unix:} \verb+webbioc+ was written in a Unix environment
-and depends on many Unix conventions including pathnames, directory
-structure, and interprocess communitation. It is doubtful whether
+and depends on many Unix conventions including path names, directory
+structure, and interprocess communication. It is doubtful whether
 it will run under Windows and has not been tested as such. However,
 an ambitious person could port \verb+webbioc+ to Windows. The
 community would greatly appreciate such an effort.
@@ -172,14 +173,17 @@ as part of the default installation. \verb+webbioc+ currently uses
 the following modules: CGI, Digest::MD5, File::stat, IPC::Open3,
 and POSIX.
 
+\item {\bf Ghostscript:} The web interface uses Ghostscript to
+produce raw graphics. It must be installed.
+
 \item {\bf Netpbm:} The Netpbm series of programs handle graphics
-manipulation. If you install it using RPM's, make sure to install
+manipulation. If you install it using the RPMs, make sure to install
 both netpbm and netpbmprogs.
 
 \item {\bf PBS:} PBS Pro was used for development. OpenPBS should
 also work although it has not been tested. If you will be using
 PBS, \verb+webbioc+ depends on having a shared filesystem mounted
-in the sampe place on the web server as well as all the compute
+in the same place on the web server as well as all the compute
 nodes.
 
 \end{itemize}
@@ -199,7 +203,7 @@ and the command \verb+chmod 644 *.pm+ to make the support modules
 readable.
 
 You must decide how you want to link the Bioconductor web interface
-into your existing web site. It was designed to integrate seamlesly
+into your existing web site. It was designed to integrate seamlessly
 into an existing site design. \verb+webbioc+ includes a very
 rudimentary home page in /\verb+R lib dir+/webbioc/www/. You may
 either use this as a starting point or create your own. Please note
@@ -211,7 +215,7 @@ where the web interface can store files. Remember that if using
 PBS, these two directories must be shared between the web server
 and all compute nodes via NFS (or some other file sharing mechanism).
 If other users have access to any of the machines running the web
-interface, we reccommend setting the permisions of these directories
+interface, we recommend setting the permissions of these directories
 so that only the web sever user can read them.
 
 The first directory will be for storing uploaded files. The largest 
@@ -234,6 +238,55 @@ the contribution of any scripts towards that end.
 
 \section{Configuration}
 
+Beyond putting the CGI scripts and HTML page in the right places
+and setting up directories to receive files, all configuration is
+done through the Site.pm file. The most important configuration
+options are discussed here.
 
+\begin{itemize}
+
+\item {\bf UPLOAD\_DIR} This is the directory where uploaded files
+are stored. You should set this to the absolute path name of the
+upload directory created earlier.
+
+\item {\bf RESULT\_DIR} This is the directory where the web interface
+will place all result files. You should set this to the absolute
+path name of the results directory created earlier.
+
+\item {\bf RESULT\_URL} This is the absolute URL from which the
+above directory can be accessed through your web server. In almost
+all cases this is different than the filesystem path.
+
+\item {\bf R\_BINARY} The path to the R executable you wish to use
+with the web interface. If using PBS, R must be placed in the same
+location on both the web server and computed nodes.
+
+\item {\bf R\_LIBS} If you store R libraries outside the default
+location, enter the paths to those directories here as a colon-delimited
+list. Otherwise leave this as an empty string.
+
+\item {\bf DEBUG} Turn on or off debug mode. If debug mode is on,
+the web interface will leave scripts, output, and other files behind
+for inspection. Otherwise, those files will be deleted before a
+job completes.
+
+\item {\bf SH\_HEADER} This option is for appending lines to the
+top of all shell scripts. It can be very useful for setting
+environment variables such as PATH. (PATH must include the directories
+containing standard shell tools, Ghostscript, and Netpbm binaries.)
+Depending on your installation you may have to set the GS\_LIB
+variable so Ghostscript can find its libraries and fonts.
+
+\item {\bf site\_header} This subroutine is called to produce the
+site header HTML for all CGI pages. It is implemented as a function
+to allow you to include other files and/or do any other crazy
+programming you wish. If you make changes, make sure to set the
+title of the page to the \$title Perl variable.
+
+\item {\bf site\_footer} This subroutine is called to produce the
+site footer HTML for all CGI pages. It is your responsibility to
+close off any HTML tags here that you open in site\_footer.
+
+\end{itemize}
 
 \end{document}
