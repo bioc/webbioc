@@ -1,3 +1,5 @@
+require("reposTools")
+
 installReps <- function(repNames = c("BIOCData", "BIOCcdf", "BIOCprobes"), 
                         lib = reposToolsLibPaths()[1]) {
 

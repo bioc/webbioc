@@ -53,7 +53,7 @@ mt.wrapper <- function(proc, X, classlabel, test="t", rawpcalc="Parametric", sid
     }
 	if (side == "lower") {
 	    if (test == "t" || test == "t.equalvar" || test == "pairt")
-		    rawp <- 1 - pt(teststat, df1, df2, lower.tail = FALSE)
+		    rawp <- 1 - pt(teststat, df, lower.tail = FALSE)
 	    if (test == "wilcoxon")
 	        rawp <- 1 - pwilcox(teststat, m, n, lower.tail = FALSE)
 	    if (test == "f" || test == "blockf")

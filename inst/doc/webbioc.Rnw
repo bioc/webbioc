@@ -237,11 +237,10 @@ metadata package from the Bioconductor web site. The following will
 install all metadata packages and update any out-of-date metadata
 packages. (Change the path name to match your system.)
 
-<<eval=FALSE>>=
-library(reposTools)
+\begin{verbatim}
 library(webbioc)
 installReps("/library/install/path")
-@
+\end{verbatim}
 
 Make sure to run R with a user who has permission to write to your
 library directory. Depending on your site, you may wish to set up
