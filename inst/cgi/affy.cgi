@@ -1,9 +1,10 @@
-#!/usr/bin/perl -w -I/sw/lib/perl5/5.6.0/darwin
+#!/usr/bin/perl -w
 
 use CGI qw/:standard/;
 use CGI::Pretty;
 $CGI::Pretty::INDENT = "";
 use FileManager;
+use Batch;
 use BioC;
 use Site;
 use strict;
@@ -128,8 +129,7 @@ sub step2 {
 		  '</table></ul>',
 		  p($cgi->checkbox('log2trans','checked','YES','Log base 2 transform the results (required for multtest)')),
 		  p($cgi->checkbox('fmcopy','checked','YES','Copy exprSet back to the upload manager for further analysis')),
-		  $USE_PBS ? p("E-mail address where you would like your job status sent: (optional)", br(),
-            textfield('email', '', 40)) : "",
+		  p("E-mail address where you would like your job status sent: (optional)", br(), textfield('email', '', 40)),
 	      p(submit("Submit Job")),
 	      end_form;
 	
@@ -176,7 +176,7 @@ END
 ####
 sub step3 {
 	my $jobname = "affy-" . rand_token();
-	my (@filenames, $script, $output, $jobsummary, $custom, $error, $args);
+	my (@filenames, $script, $output, $jobsummary, $custom, $error, $args, $job);
 	my @custom = $cgi->param('custom');
 	
 	for (my $i = 0; $i < $cgi->param('numfiles'); $i++) {
@@ -217,8 +217,16 @@ END
 	                      "Affymetrix Expression Analysis", $cgi->param('email'));
 	error($error) if $error;
     
-    start_job($jobname, "$RESULT_DIR/$jobname") ||
+    $job = new Batch;
+    $job->type($BATCH_SYSTEM);
+    $job->script("$RESULT_DIR/$jobname/$jobname.sh");
+    $job->name($jobname);
+    $job->out("$RESULT_DIR/$jobname/$jobname.out");
+    $job->submit ||
     	error("Couldn't start job");
+    open(ID, ">$RESULT_DIR/$jobname/id") || error("Couldn't write job id file");
+    print ID $job->id;
+    close(ID);
     log_job($jobname, "Affymetrix Expression Analysis", $fm);
     
     print $cgi->redirect("job.cgi?name=$jobname");
@@ -262,7 +270,10 @@ normalize.AffyBatch.methods <- c(normalize.AffyBatch.methods, "vsn")
 express.summary.stat.methods <- c(express.summary.stat.methods, "rlm")
 setwd(filepath)
 if (process == "RMA")
-    exprset <- just.rma(filenames = filenames)
+    exprset <- rma(ReadAffy(filenames = filenames))
+# This is causing an error on Linux but not Mac OS X
+# More investigation needed
+#    exprset <- just.rma(filenames = filenames)
 if (process == "Custom") {
     affybatch <- ReadAffy(filenames = filenames)
     bgcorrect.param <- list()

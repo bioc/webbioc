@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w -I/sw/lib/perl5/5.6.0/darwin
+#!/usr/bin/perl -w
 
 use CGI qw/:standard/;
 use CGI::Pretty;
 $CGI::Pretty::INDENT = "";
+use Batch;
 use BioC;
 use Site;
 use strict;
@@ -54,8 +55,8 @@ sub form {
 		                        'hgu95c', 'hgu95d', 'hu6800', 'mgu74av2', 
 		                        'mgu74b', 'mgu74c', 'rgu34a', 'rgu34b', 
 		                        'rgu34c', 'rae230a', 'rae230b', 'YEAST'])),
-	      $USE_PBS ? p("E-mail address where you would like your job status sent: (optional)", br,
-            textfield('email', '', 40)) : "";
+	      p("E-mail address where you would like your job status sent: (optional)", br,
+            textfield('email', '', 40));
     
     print h3('Text:'),
 		  p(textfield('text', '', 40)),
@@ -114,7 +115,7 @@ sub text {
     $text =~ s/^\s+|\s+$//g;
     $text =~ s/\s+[,;]|[,:]\s+/,/g;
 	my @text = split(/[,;]/, $text);
-	my ($script, $output, $jobsummary, $error);
+	my ($script, $output, $jobsummary, $error, $job);
 	
 	if (!$cgi->param('colnames')) {
 		error("No data columns specified.");
@@ -143,8 +144,16 @@ END
 	                      "Affymetrix Probe Search", $cgi->param('email'));
 	error($error) if $error;
 	
-	start_job($jobname, "$RESULT_DIR/$jobname") ||
+	$job = new Batch;
+    $job->type($BATCH_SYSTEM);
+    $job->script("$RESULT_DIR/$jobname/$jobname.sh");
+    $job->name($jobname);
+    $job->out("$RESULT_DIR/$jobname/$jobname.out");
+    $job->submit ||
     	error("Couldn't start job");
+    open(ID, ">$RESULT_DIR/$jobname/id") || error("Couldn't write job id file");
+    print ID $job->id;
+    close(ID);
     log_job($jobname, $cgi->param('colnames') . " Search", $fm);
     
     print $cgi->redirect("job.cgi?name=$jobname");
@@ -201,7 +210,7 @@ sub go {
     $go =~ s/^\s+|\s+$//g;
     $go =~ s/\s+[,;]|[,:]\s+/,/g;
 	my @go = split(/[,;]/, $go);
-	my ($script, $output, $jobsummary, $error);
+	my ($script, $output, $jobsummary, $error, $job);
 	
 	if (!$cgi->param('go')) {
 		error("Please enter a Gene Ontology id to search.");
@@ -230,8 +239,16 @@ END
 	                      "Affymetrix Probe Search", $cgi->param('email'));
 	error($error) if $error;
 	
-	start_job($jobname, "$RESULT_DIR/$jobname") ||
+	$job = new Batch;
+    $job->type($BATCH_SYSTEM);
+    $job->script("$RESULT_DIR/$jobname/$jobname.sh");
+    $job->name($jobname);
+    $job->out("$RESULT_DIR/$jobname/$jobname.out");
+    $job->submit ||
     	error("Couldn't start job");
+    open(ID, ">$RESULT_DIR/$jobname/id") || error("Couldn't write job id file");
+    print ID $job->id;
+    close(ID);
     log_job($jobname, "Gene Ontology ID Search", $fm);
     
     print $cgi->redirect("job.cgi?name=$jobname");

@@ -132,32 +132,22 @@ for the benefit of the user as the web interface ignores them.
 
 \begin{itemize}
 
-\item {\bf R 1.7.0:} \verb+webbioc+ has only been tested with R
-1.7.0 and later and there is no guarantee that it will work with
+\item {\bf R 1.8.0:} \verb+webbioc+ has only been tested with R
+1.8.0 and later and there is no guarantee that it will work with
 any version earlier than that.
-
-\item {\bf Biobase:} Obtaining a version of \verb+Biobase+ that
-will work poses a slight conundrum. \verb+matchprobes+ depends on
-\verb+Biobase+ 1.3.29, which itself depends on a developmental
-build of R 1.8.0. The author has created a special version of
-\verb+Biobase+ which works with both R 1.7.x and \verb+matchprobes+.
-It can be downloaded at:
-
-\url{http://genome.nasa.gov/downloads/Biobase_1.3.29.tar.gz}
 
 \item {\bf affy, multtest, annaffy, vsn, gcrma:} \verb+webbioc+
 directly invokes these packages for processing work. Additionally,
 those packages depend on others that are not listed here but must
-also be installed.
+also be installed. 
 
 \item {\bf Bioconductor metadata packages:} Much of the computation
 done by \verb+affy+, \verb+annaffy+, and \verb+gcrma+ depends on
 pre-built metadata packages available on the Bioconductor web site.
-We recommend that all of the metadata packages be installed so
-that users are given the maximum flexibility with which chips they
-may process. Future versions of \verb+webbioc+ should include
-mechanisms for automatically downloading all relevant metadata
-packages.
+We recommend that all of the metadata packages be installed so that
+users are given the maximum flexibility with which chips they may
+process. As of this writing, a full install of Bioconductor and all
+data packages uses approximately 1.25 GB of disk space.
 
 \item {\bf Unix:} \verb+webbioc+ was written in a Unix environment
 and depends on many Unix conventions including path names, directory
@@ -180,11 +170,16 @@ produce raw graphics. It must be installed.
 manipulation. If you install it using the RPMs, make sure to install
 both netpbm and netpbmprogs.
 
-\item {\bf PBS:} PBS Pro was used for development. OpenPBS should
-also work although it has not been tested. If you will be using
-PBS, \verb+webbioc+ depends on having a shared filesystem mounted
+\item {\bf SGE or PBS (Optional):} \verb+webbioc+ has been developed
+and tested with two batch queueing systems, the Sun Grid Engine and
+the Portable Batch System. (Only PBS Pro has been tested, although
+OpenPBS should also work.) If you will be using a batch queueing
+system, \verb+webbioc+ depends on having a shared filesystem mounted
 in the same place on the web server as well as all the compute
-nodes.
+nodes. Please note that these are optional as \verb+webbioc+ can
+also run jobs by forking to the background. Adding support for
+another batch queueing system is a fairly trivial matter. Please
+contact the author if you are interested in using a different system.
 
 \end{itemize}
 
@@ -210,13 +205,13 @@ either use this as a starting point or create your own. Please note
 that you may have to change the links slightly depending on where
 you place the CGI scripts.
 
-The last step of the installation is to create two directories
-where the web interface can store files. Remember that if using
-PBS, these two directories must be shared between the web server
-and all compute nodes via NFS (or some other file sharing mechanism).
-If other users have access to any of the machines running the web
-interface, we recommend setting the permissions of these directories
-so that only the web sever user can read them.
+The last step of the installation is to create two directories where
+the web interface can store files. Remember that if using a batch
+queueing system, these two directories must be shared between the
+web server and all compute nodes via NFS (or some other file sharing
+mechanism).  If other users have access to any of the machines
+running the web interface, we recommend setting the permissions of
+these directories so that only the web sever user can read them.
 
 The first directory will be for storing uploaded files. The largest 
 type of file uploaded will probably be CEL files. They are typically
@@ -236,12 +231,31 @@ future we hope to provide scripts that will help you do that.
 Until then, you will have to handle that yourself. We would appreciate
 the contribution of any scripts towards that end.
 
+To facilitate installation and updating of metadata packages,
+\verb+webbioc+ includes a function to download and install every
+metadata package from the Bioconductor web site. The following will
+install all metadata packages and update any out-of-date metadata
+packages. (Change the path name to match your system.)
+
+<<eval=FALSE>>=
+library(reposTools)
+library(webbioc)
+installReps("/library/install/path")
+@
+
+Make sure to run R with a user who has permission to write to your
+library directory. Depending on your site, you may wish to set up
+a cron job to execute this code approximately once per month to
+check for updates or additions to the medadata packages. If packages
+are already up-to-date, it will not waste bandwidth nor CPU by
+re-installing them.
+
 \section{Configuration}
 
 Beyond putting the CGI scripts and HTML page in the right places
 and setting up directories to receive files, all configuration is
-done through the Site.pm file. The most important configuration
-options are discussed here.
+done through the Site.pm file. The configuration options are discussed
+here.
 
 \begin{itemize}
 
@@ -257,6 +271,13 @@ path name of the results directory created earlier.
 above directory can be accessed through your web server. In almost
 all cases this is different than the filesystem path.
 
+\item {\bf BIOC\_URL} This is the absolute URL to the CGI scripts
+installed earlier.
+
+\item {\bf SITE\_URL} This is the site URL including only the domain
+name. It combined with the above URL to create links within the
+system.
+
 \item {\bf R\_BINARY} The path to the R executable you wish to use
 with the web interface. If using PBS, R must be placed in the same
 location on both the web server and computed nodes.
@@ -271,11 +292,27 @@ for inspection. Otherwise, those files will be deleted before a
 job completes.
 
 \item {\bf SH\_HEADER} This option is for appending lines to the
-top of all shell scripts. It can be very useful for setting
-environment variables such as PATH. (PATH must include the directories
-containing standard shell tools, Ghostscript, and Netpbm binaries.)
+top of all shell scripts. It can be very useful for setting environment
+variables such as PATH. (PATH must include the directories containing
+standard shell tools, Ghostscript, Netpbm binaries, and sendmail.)
 Depending on your installation you may have to set the GS\_LIB
 variable so Ghostscript can find its libraries and fonts.
+
+\item {\bf BATCH\_SYSTEM} This option selects the type of batch
+queueing system to use. Currently supported options are fork, sge,
+and pbs.
+
+\item {\bf BATCH\_ENV} This hash allows you to set environment
+variables necessary for running the batch queueing system. SGE
+typically needs SGE\_ROOT and possibly SGE\_CELL or COMMD\_PORT.
+PBS typically needs PBS\_HOME, PBS\_EXEC, and PBS\_SERVER.
+
+\item {\bf BATCH\_BIN} This specifies the location of the batch
+queueing system bin directory.
+
+\item {\bf BATCH\_ARG} This specifies any additional arguments to
+be passed to the job submission program that are necessary for job
+routing, accounting, etc. It can be left blank.
 
 \item {\bf site\_header} This subroutine is called to produce the
 site header HTML for all CGI pages. It is implemented as a function

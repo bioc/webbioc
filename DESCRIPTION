@@ -1,6 +1,6 @@
 Package: webbioc
-Version: 0.1.3
-Date: 2003-11-04
+Version: 0.2
+Date: 2003-11-25
 Title: Bioconductor Web Interface
 Author: Colin A. Smith <webbioc@colinsmith.org>
 Maintainer: Colin A. Smith <webbioc@colinsmith.org>

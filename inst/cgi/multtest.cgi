@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w -I/sw/lib/perl5/5.6.0/darwin
+#!/usr/bin/perl -w
 
 use CGI qw/:standard/;
 use CGI::Pretty;
 $CGI::Pretty::INDENT = "";
 use POSIX;
 use FileManager;
+use Batch;
 use BioC;
 use Site;
 use strict;
@@ -204,8 +205,8 @@ sub step3 {
 	      p(checkbox('exprs','','YES','Include expression values in results')),
 		  p(checkbox('fmcopy','','YES','Copy aafTable back to the upload manager for further annotation')),
 		  p("Web Page Title:", br, textfield('title', 'Multiple Testing Results', 40)),
-	      $USE_PBS ? p("E-mail address where you would like your job status sent: (optional)", br,
-            textfield('email', '', 40)) : "",
+	      p("E-mail address where you would like your job status sent: (optional)", br,
+            textfield('email', '', 40)),
           p(submit("Submit Job")),
 	      end_form;
 	
@@ -249,7 +250,7 @@ sub step4 {
 	my $genenames = $cgi->param('genenames');
 	$genenames =~ s/[,;"']/ /g;
 	my @genenames = split(' ', $genenames);
-	my ($script, $output, $jobsummary, $limit, @classlabel, $error);
+	my ($script, $output, $jobsummary, $limit, @classlabel, $error, $job);
 	
 	if (grep(/[^0-9\.]|^$/, $cgi->param('limitnum')) || !($cgi->param('limitnum') > 0)) {
 	    error('Please enter an number greater than 0.');
@@ -295,8 +296,16 @@ END
 	                      $cgi->param('title'), $cgi->param('email'));
 	error($error) if $error;
 	
-	start_job($jobname, "$RESULT_DIR/$jobname") ||
+	$job = new Batch;
+    $job->type($BATCH_SYSTEM);
+    $job->script("$RESULT_DIR/$jobname/$jobname.sh");
+    $job->name($jobname);
+    $job->out("$RESULT_DIR/$jobname/$jobname.out");
+    $job->submit ||
     	error("Couldn't start job");
+    open(ID, ">$RESULT_DIR/$jobname/id") || error("Couldn't write job id file");
+    print ID $job->id;
+    close(ID);
     log_job($jobname, $cgi->param('title'), $fm);
     
     print $cgi->redirect("job.cgi?name=$jobname");

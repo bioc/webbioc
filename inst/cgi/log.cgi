@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -I/sw/lib/perl5/5.6.0/darwin
+#!/usr/bin/perl -w
 
 use CGI qw/:standard/;
 use CGI::Pretty;

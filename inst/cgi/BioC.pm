@@ -67,7 +67,7 @@ END
 ####
 sub create_files {
     my ($jobname, $script, $output, $jobsummary, $refresh, $title, $email) = @_;
-    my $pbs;
+    my $sh;
     
     # Create job directory
     mkdir("$RESULT_DIR/$jobname", 0700) || 
@@ -79,12 +79,13 @@ sub create_files {
 	print SCRIPT $script;
 	close(SCRIPT);
 	
-	# Create PBS file
-	$pbs = generate_pbs($jobname, $email);
-	open(PBS, ">$RESULT_DIR/$jobname/$jobname.pbs") ||
-		return("Couldn't create PBS file.");
-	print PBS $pbs;
-	close(PBS);
+	# Create shell script file
+	$sh = generate_sh($jobname, $email);
+	open(SH, ">$RESULT_DIR/$jobname/$jobname.sh") ||
+		return("Couldn't create shell script file.");
+	print SH $sh;
+	close(SH);
+	chmod(0700, "$RESULT_DIR/$jobname/$jobname.sh");
 	
     # Create processing index file
 	open(INDEX, ">$RESULT_DIR/$jobname/index.html") ||
@@ -100,6 +101,7 @@ sub create_files {
 <body bgcolor="#FFFFFF">
 <h3>Processing...</h3>
 <p><a href="$RESULT_URL/$jobname/">Click here</a> to manually refresh.</p>
+<p><a href="$BIOC_URL/cancel.cgi?name=$jobname" target="_parent">Click here</a> to cancel the job.</p>
 $jobsummary
 </body>
 </html>
@@ -136,7 +138,7 @@ END
 <h3>Error:</h3>
 <p>An error occured while processing the job. Please check the
 input and try again. If the problem persists, please contact the
-site administrator.</p>
+<a href="mailto:$ADMIN_EMAIL">site administrator</a>.</p>
 <p><a href="$RESULT_URL/$jobname/$jobname.err">Click here</a> to see the error.</p>
 $jobsummary
 </body>
@@ -147,34 +149,15 @@ END
 	return undef;
 }
 
-#### Subroutine: generate_pbs
-# Generate the PBS script to run R
+#### Subroutine: generate_sh
+# Generate the shell script to run R
 ####
-sub generate_pbs {
+sub generate_sh {
 	my ($jobname, $email) = @_;
-	my $pbs;
+	my $sh;
 	
-	$pbs = <<END;
+	$sh = <<END;
 #!/bin/sh
-
-$PBS_OPTIONS
-#PBS  -N $jobname
-#PBS  -S /bin/sh
-#PBS  -j oe
-END
-
-	$pbs .= $email ? <<END : "";
-#PBS  -m e
-#PBS  -M $email
-END
-	
-	$pbs .= $DEBUG ? <<END1 : <<END2;
-#PBS  -o $RESULT_DIR/$jobname/$jobname.out
-END1
-#PBS  -k n
-END2
-
-	$pbs .= <<END;
 $SH_HEADER
 R_LIBS=$R_LIBS
 export R_LIBS
@@ -191,52 +174,52 @@ if ([[ \$STATUS == 0 ]]) then
   touch $RESULT_DIR/$jobname/index.html
 END
 
-    $pbs .= $DEBUG ? "" : <<END;
+    $sh .= $DEBUG ? "" : <<END;
+  rm $RESULT_DIR/$jobname/$jobname.sh
   rm $RESULT_DIR/$jobname/$jobname.R
+  rm $RESULT_DIR/$jobname/$jobname.out
   rm $RESULT_DIR/$jobname/$jobname.err
   rm $RESULT_DIR/$jobname/indexerror.html
+  rm $RESULT_DIR/$jobname/id
+END
+ 
+    $sh .= $email ? <<END : "";
+  sendmail -r $ADMIN_EMAIL $email <<END_EMAIL
+From: Bioconductor Web Interface <$ADMIN_EMAIL>
+Subject: Job Completed: $jobname
+To: $email
+
+Your job has finished processing. See the results here:
+
+$SITE_URL$BIOC_URL/job.cgi?name=$jobname
+END_EMAIL
 END
 
-    $pbs .= <<END;
+    $sh .= <<END;
   tar -czf /tmp/$jobname.tar.gz -C $RESULT_DIR $jobname
   mv /tmp/$jobname.tar.gz $RESULT_DIR/$jobname/ 
 else 
   mv $RESULT_DIR/$jobname/indexerror.html $RESULT_DIR/$jobname/index.html
   touch $RESULT_DIR/$jobname/index.html
   rm $RESULT_DIR/$jobname/indexresult.html
+END
+ 
+    $sh .= $email ? <<END : "";
+  sendmail -r $ADMIN_EMAIL $email <<END_EMAIL
+From: Bioconductor Web Interface <$ADMIN_EMAIL>
+Subject: Job Error: $jobname
+To: $email
+
+There was a problem while processing your job. See the error here:
+
+$SITE_URL$BIOC_URL/job.cgi?name=$jobname
+END_EMAIL
+END
+
+    $sh .= <<END;
 fi
 exit \$STATUS
 END
-}
-
-#### Subroutine: start_job
-# Starts the job described by $jobname.pbs in $jobdir. Returns 1 on success.
-####
-sub start_job {
-	my ($jobname, $jobdir) = @_;
-	my $pid;
-	
-	if (!($pid = fork)) {
-    	# Child process
-        if (!defined $pid) {
-            # Fork didn't work
-		    return 0;
-		}
-		close STDOUT;
-		
-		if ($USE_PBS) {
-			open(STDOUT, $DEBUG ? ">$jobdir/$jobname.job" : ">/dev/null");
-			submit_pbs("$jobdir/$jobname.pbs");
-		} else {
-        	system("/bin/sh $jobdir/$jobname.pbs " . ($DEBUG ? "> $jobdir/$jobname.out" : "> /dev/null"));
-        }
-        if (!$DEBUG) {
-            unlink("$jobdir/$jobname.pbs");
-        }
-        exit(0);
-    }
-    
-    return 1;
 }
 
 #### Subroutine: log_job

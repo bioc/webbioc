@@ -1,9 +1,10 @@
-#!/usr/bin/perl -w -I/sw/lib/perl5/5.6.0/darwin
+#!/usr/bin/perl -w
 
 use CGI qw/:standard/;
 use CGI::Pretty;
 $CGI::Pretty::INDENT = "";
 use FileManager;
+use Batch;
 use BioC;
 use Site;
 use strict;
@@ -86,8 +87,8 @@ sub step1 {
 	      '</table>',
 	      p('Web Page Title:', br(),
 	        textfield('title', 'Affymetrix Probe Listing', 40)),
-	      $USE_PBS ? p("E-mail address where you would like your job status sent: (optional)", br(),
-            textfield('email', '', 40)) : "",
+	      p("E-mail address where you would like your job status sent: (optional)", br(),
+            textfield('email', '', 40)),
 	      submit("Submit Job"),
 	      end_form,
 	      start_form,
@@ -168,7 +169,7 @@ sub step2 {
 	my $probeids = $cgi->param('probeids');
 	$probeids =~ s/[,;"']/ /g;
 	my @probeids = split(' ', $probeids);
-	my ($script, $output, $jobsummary, $error);
+	my ($script, $output, $jobsummary, $error, $job);
 	
 	if (!@probeids) {
 		error("No probe ids specified.");
@@ -199,8 +200,16 @@ END
 	                      $cgi->param('title'), $cgi->param('email'));
 	error($error) if $error;
 	
-	start_job($jobname, "$RESULT_DIR/$jobname") ||
+	$job = new Batch;
+    $job->type($BATCH_SYSTEM);
+    $job->script("$RESULT_DIR/$jobname/$jobname.sh");
+    $job->name($jobname);
+    $job->out("$RESULT_DIR/$jobname/$jobname.out");
+    $job->submit ||
     	error("Couldn't start job");
+    open(ID, ">$RESULT_DIR/$jobname/id") || error("Couldn't write job id file");
+    print ID $job->id;
+    close(ID);
     log_job($jobname, $cgi->param('title'), $fm);
     
     print $cgi->redirect("job.cgi?name=$jobname");
