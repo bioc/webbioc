@@ -163,7 +163,7 @@ R_LIBS=$R_LIBS
 export R_LIBS
 $R_BINARY --no-save < $RESULT_DIR/$jobname/$jobname.R 2> $RESULT_DIR/$jobname/$jobname.err
 STATUS=\$?
-if test \$STATUS -eq 0; then
+if ([[ \$STATUS == 0 ]]) then
   if ([[ -n `find $RESULT_DIR/$jobname -name '*.png'` ]]) then
     for i in $RESULT_DIR/$jobname/*.png; do
       pngtopnm \$i | pnmscale -r 4 | pnmtopng > \$i.tmp
