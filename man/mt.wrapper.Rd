@@ -72,7 +72,7 @@ mt.wrapper(proc, X, classlabel, test="t", rawpcalc="Parametric", side="abs", ...
     order, use \code{teststat[order(index)]}.}
   \item{rawp}{Vector of raw (unadjusted) \eqn{p}-values, ordered according to \code{index}.}
   \item{adjp}{Vector of adjusted \eqn{p}-values, ordered according to \code{index}.}
-  \item{plower}{For \code{\link{mt.minP}} function only, vector of
+  \item{plower}{For \code{\link[multtest]{mt.minP}} function only, vector of
     "adjusted \eqn{p}-values", where ties in the permutation
     distribution of the successive minima of raw \eqn{p}-values
     with the observed \eqn{p}-values are counted only once. Note
