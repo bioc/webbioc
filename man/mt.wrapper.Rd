@@ -58,7 +58,7 @@ mt.wrapper(proc, X, classlabel, test="t", rawpcalc="Parametric", side="abs", ...
     If \code{side="upper"}, one-tailed tests, the null hypothesis is rejected for large values of the test statistic.\cr
     If \code{side="lower"}, one-tailed tests,  the null hypothesis is rejected for small values of the test statistic.
   }
-  \item{...}{Further arguments for \code{mt.maxT}, \code[multtest]{mt.minP}, \code{qvalue}.}
+  \item{...}{Further arguments for \code{mt.maxT}, \code{mt.minP}, \code{qvalue}.}
 }
 
 \value{
