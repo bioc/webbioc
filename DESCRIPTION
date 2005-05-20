@@ -1,15 +1,17 @@
 Package: webbioc
-Version: 1.0.1
+Version: 1.1.0
 Date: 2004-08-04
 Title: Bioconductor Web Interface
 Author: Colin A. Smith <webbioc@colinsmith.org>
 Maintainer: Colin A. Smith <webbioc@colinsmith.org>
-Depends: R (>= 1.8.0), affy, multtest, annaffy (>= 1.0.1), vsn, gcrma (>= 0.4.0)
+Depends: R (>= 1.8.0), affy, multtest, annaffy (>= 1.0.1), vsn, gcrma
+        (>= 0.4.0)
 SystemRequirements: Unix, Perl (>= 5.6.0), Netpbm
-Description: An integrated web interface for doing microarray
-  analysis using several of the Bioconductor packages. It is intended
-  to be deployed as a centralized bioinformatics resource for use
-  by many users. (Currently only Affymetrix oligonucleotide analysis
-  is supported.)
+Description: An integrated web interface for doing microarray analysis
+        using several of the Bioconductor packages. It is intended to
+        be deployed as a centralized bioinformatics resource for use
+        by many users. (Currently only Affymetrix oligonucleotide
+        analysis is supported.)
 License: GPL version 2 or newer
 URL: http://www.bioconductor.org/
+
