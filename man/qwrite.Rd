@@ -6,7 +6,7 @@
 }
 
 \usage{
-qwrite(qobj, filename="my-qvalue-results.txt
+qwrite(qobj, filename="my-qvalue-results.txt")
 }
 \arguments{
   \item{qobj}{a q-value object returned by the qvalue function}
