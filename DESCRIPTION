@@ -1,5 +1,5 @@
 Package: webbioc
-Version: 1.1.1
+Version: 1.1.2
 Date: 2004-08-04
 Title: Bioconductor Web Interface
 Author: Colin A. Smith <webbioc@colinsmith.org>
@@ -14,4 +14,4 @@ Description: An integrated web interface for doing microarray analysis
         analysis is supported.)
 License: GPL version 2 or newer
 URL: http://www.bioconductor.org/
-
+SaveImage: yes
