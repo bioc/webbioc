@@ -1,0 +1,80 @@
+This the resluts of a user attempting to port webbioc to Windows. It was
+ultimately abaondoned. According to the author, Matthias Wjst:
+
+"It is working in principle, however, I am  running into severe memory
+problems that I do not think its being worthwile to continue."
+
+=====================================================
+README webbioc installation on WINDOWS 2000 server
+10May04/03Jul04 wjst@gsf.de
+=====================================================
+
+needs previously installed Apache, R, PERL and Ghostscript
+install webbioc package in d:\programme\rw1081\library\webbioc\ 
+help is in d:\programme\rw1081\library\webbioc\doc\webbioc.pdf
+
+=====================================================
+Ghostscript
+System>Properties>Environment>Variables>General
+SET R_GSCMD="D:\Programme\gs\gs8.14\bin\gswin32c.exe"
+
+=====================================================
+Apache 
+insert in d:\network\apache\Apache\conf\httpd.conf
+
+ScriptAlias /cgi-bin/bioconductor/bin "D:/mirror/cooke/www/cgi-bin/bioconductor/bin/"
+<Directory "D:/mirror/cooke/www/cgi-bin/bioconductor/bin">
+    AllowOverride all
+    Options ExecCGI
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<Directory "D:/mirror/cooke/www/cgi-bin/bioconductor/bin/download">
+        Options Indexes FollowSymlinks MultiViews
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+</Directory>
+
+=====================================================
+Bioconductor 
+
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\Site.pm
+adjust all paths to current web cgi directory
+line 38 insert rem
+
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\BioC.pm
+line 160-163 insert rem
+line 164 replace "--no-save" with "--vanilla"
+line 165-174 insert rem
+line 177-182 replace "rm" with "del"
+line 198-203 insert rem
+line 219-220 insert rem
+
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\affy.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\annaffy.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\annaffysearch.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\cancel.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\job.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\log.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\multtest.cgi
+edit d:\mirror\cooke\www\cgi-bin\bioconductor\upload.cgi
+
+replace "#!/usr/bin/perl -w" with "#!d:/programme/Perl521/bin/Perl.exe -w"
+replace ".sh" with ".cmd"
+
+=====================================================
+
+system is running
+but stopped here with severy memory problems: should have at least 512 or 1024  MB
+
+process control so far not supported 
+output dummy string to file at beginning of shell script and delete it at the end?
+or use the ps and kill equivalent in a DOS box?
+
+email so far not supported
+use freeware blat.exe?
+
+tarring not supported
+use freeware tar.exe?
