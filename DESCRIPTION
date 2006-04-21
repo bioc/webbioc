@@ -15,3 +15,4 @@ Description: An integrated web interface for doing microarray analysis
 License: GPL version 2 or newer
 URL: http://www.bioconductor.org/
 SaveImage: yes
+biocViews: Infrastructure, Microarray, OneChannel, DifferentialExpression
