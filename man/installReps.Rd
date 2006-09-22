@@ -6,8 +6,8 @@
 }
 
 \usage{
-installReps(repNames = c("BIOCData", "BIOCcdf", "BIOCprobes"),
-            lib = reposToolsLibPaths()[1])
+installReps(repNames = "aData", lib = .libPaths()[1], 
+            type = getOption("pkgType"))
 }
 \arguments{
   \item{repNames}{A character vector containing repository names. A listing
@@ -16,6 +16,7 @@ installReps(repNames = c("BIOCData", "BIOCcdf", "BIOCprobes"),
   \item{lib}{A path to install/update the packages. If this directory does not
     exist, it will be created (if possible).
   }
+  \item{type}{type of package do download}
 }
 
 \author{Colin A. Smith \email{webbioc@colinsmith.org}}
