@@ -228,7 +228,7 @@ For more information about multiple testing, see these two papers:
 Y. Ge, S. Dudoit, and T. P. Speed (2003). Resampling-based multiple
 testing for microarray data analysis. <em>TEST</em>, Vol. 12, No.
 1, p.  1-44 (plus discussion p. 44-77) <a
-href="http://www.stat.berkeley.edu/~gyc/633.pdf">[PDF]</a>
+href="http://www.stat.berkeley.edu/tech-reports/633.pdf">[PDF]</a>
 </p>
 
 <p>
@@ -368,6 +368,7 @@ library(Biobase)
 library(multtest)
 library(annaffy)
 library(webbioc)
+library(qvalue)
 
 cols <- which(classlabel != "Ignore")
 classlabel <- as.integer(classlabel[cols])

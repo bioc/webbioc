@@ -136,7 +136,8 @@ for the benefit of the user as the web interface ignores them.
 1.8.0 and later and there is no guarantee that it will work with
 any version earlier than that.
 
-\item {\bf affy, multtest, annaffy, vsn, gcrma:} \verb+webbioc+
+\item {\bf Biobase, affy, multtest, annaffy, vsn, gcrma, qvalue:} 
+\verb+webbioc+
 directly invokes these packages for processing work. Additionally,
 those packages depend on others that are not listed here but must
 also be installed. 

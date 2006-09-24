@@ -116,16 +116,17 @@ sub step2 {
 	print '</table>',
 		  p("Choose the processing method:"),
 		  p($cgi->radio_group('process', ['RMA'], 'RMA')),
+		  p($cgi->radio_group('process', ['GCRMA'], '-')),
 		  p($cgi->radio_group('process', ['Custom'], '-')),
 		  '<ul><table>',
 		  Tr(td({-style=>"text-align: right"}, "Background Correction:"), 
-		     td(popup_menu('custom', ['none', 'rma', 'rma2', 'mas', 'gcrma-eb', 'gcrma-mle'], 'rma'))),
+		     td(popup_menu('custom', ['none', 'rma', 'rma2', 'mas'], 'rma'))),
 		  Tr(td({-style=>"text-align: right"}, "Normalization:"),
 		     td(popup_menu('custom', ['quantiles', 'quantiles.robust', 'loess', 'contrasts', 'constant', 'invariantset', 'qspline', 'vsn'], 'quantiles'))),
 		  Tr(td({-style=>"text-align: right"}, "PM Correction:"),
 		     td(popup_menu('custom', ['mas', 'pmonly', 'subtractmm'], 'pmonly'))),
 		  Tr(td({-style=>"text-align: right"}, "Summarization:"),
-		     td(popup_menu('custom', ['avgdiff', 'liwong', 'mas', 'medianpolish', 'playerout', 'rlm'], 'medianpolish'))),
+		     td(popup_menu('custom', ['avgdiff', 'liwong', 'mas', 'medianpolish', 'playerout'], 'medianpolish'))),
 		  '</table></ul>',
 		  p($cgi->checkbox('log2trans','checked','YES','Log base 2 transform the results (required for multtest)')),
 		  p($cgi->checkbox('fmcopy','checked','YES','Copy exprSet back to the upload manager for further analysis')),
@@ -158,13 +159,11 @@ calibration and variance stabilization with VSN</a>.
 GCRMA is an expression measure developed by Zhijin Wu and Rafael
 A. Irizarry.  It pools MM probes with similar GC content to form
 a pseudo-MM suitable for background correction of those probe pairs.
-To use GCRMA, select either gcrma-eb or gcrma-mle for Background
-Correction and rlm for Summarization. For further information,
+For further information,
 please see their paper currently under preparation, <a
 href="http://www.biostat.jhsph.edu/~ririzarr/papers/gcpaper.pdf">A
 Model Based Background Adjustement for Oligonucleotide Expression
-Arrays</a>.  Also, please note that the gcrma R package is currenly
-a developmental version.
+Arrays</a>.
 </p>
 END
 	
@@ -201,9 +200,6 @@ END
 	$args = "";
 	if ($cgi->param('process') eq "Custom") {
 	    $args = ": " . join(' -> ', $cgi->param('custom'));
-	}
-	if ($cgi->param('process') eq "GCRMA") {
-	    $args = ": " . join(', ', $cgi->param('gcrma'));
 	}
 	$jobsummary = jobsummary('Files',  join(', ', @filenames),
                              'Sample&nbsp;Names', join(', ', $cgi->param('sampleNames')),
@@ -265,15 +261,15 @@ END
 library(affy)
 library(gcrma)
 library(vsn)
-bgcorrect.methods <- c(bgcorrect.methods, "gcrma")
 normalize.AffyBatch.methods <- c(normalize.AffyBatch.methods, "vsn")
-express.summary.stat.methods <- c(express.summary.stat.methods, "rlm")
 setwd(filepath)
 if (process == "RMA")
     exprset <- rma(ReadAffy(filenames = filenames))
 # This is causing an error on Linux but not Mac OS X
 # More investigation needed
 #    exprset <- just.rma(filenames = filenames)
+if (process == "GCRMA")
+    exprset <- gcrma(ReadAffy(filenames = filenames))
 if (process == "Custom") {
     affybatch <- ReadAffy(filenames = filenames)
     bgcorrect.param <- list()

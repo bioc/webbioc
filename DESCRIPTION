@@ -1,11 +1,10 @@
 Package: webbioc
-Version: 1.5.1
-Date: 2006-09-22
+Version: 1.5.2
+Date: 2006-09-23
 Title: Bioconductor Web Interface
 Author: Colin A. Smith <webbioc@colinsmith.org>
 Maintainer: Colin A. Smith <webbioc@colinsmith.org>
-Depends: R (>= 1.8.0), affy, multtest, annaffy (>= 1.0.1), vsn, gcrma
-        (>= 0.4.0), Biobase
+Depends: R (>= 1.8.0), Biobase, affy, multtest, annaffy, vsn, gcrma, qvalue
 SystemRequirements: Unix, Perl (>= 5.6.0), Netpbm
 Description: An integrated web interface for doing microarray analysis
         using several of the Bioconductor packages. It is intended to
