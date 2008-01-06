@@ -102,7 +102,7 @@ couple of minutes.
 link and then click the \verb+Next Step+ button. (The upload manager
 token should already be filled in for you.)
 
-\item Select the exprSet that you just created which will be at
+\item Select the ExpressionSet that you just created which will be at
 the end of the list. Unless there are more than two types of
 experimental samples (usually control and experimental), leave the
 number of experimental classes as 2. Click the \verb+Next Step+

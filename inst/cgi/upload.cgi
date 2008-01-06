@@ -119,7 +119,7 @@ to prevent the disk from filling up. You can generally count on
 files lasting for at least a week, although we do not back them up
 so that may not be the case should an unexpected disk failure occur.
 Please download and save any results you wish to keep for an extended
-period of time. You may always re-upload exprSets or aafTables for
+period of time. You may always re-upload ExpressionSets or aafTables for
 further processing at a later date.
 </p>
 END

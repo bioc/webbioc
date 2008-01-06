@@ -9,7 +9,7 @@ use strict;
 
 our @ISA = qw/Exporter/; 
 our @EXPORT = qw/rand_token check_email jobsummary create_files start_job 
-                 log_job parse_exprSet parse_aafTable/;
+                 log_job parse_ExpressionSet  parse_aafTable/;
 
 #### Subroutine: rand_token
 # Generate a random token 8 characters long
@@ -241,10 +241,10 @@ sub log_job {
 	return undef;
 }
 
-#### Subroutine: parse_exprSet
-# Parses exprSet properties out of an R data file
+#### Subroutine: parse_ExpressionSet
+# Parses ExpressionSet properties out of an R data file
 ####
-sub parse_exprSet {
+sub parse_ExpressionSet {
 	my ($filename, $name, $sampleNames, $geneNames, $annotation) = @_;
 	my ($pid, $rdrfh, $wtrfh);
 	my $error = "Unexpected error during parse. R not available?";
@@ -260,17 +260,17 @@ parseExprSet <- function(filename) {
 	if (length(name) != 1)
 		stop("Wrong number of objects in file")
 	expr <- get(name)
-	if (class(expr) != "exprSet")
+	if (class(expr) != "ExpressionSet")
 		stop("Invalid object class")
 	cat("\nname: ", name, "\n", sep = "")
 
-	samples <- colnames(attributes(expr)$exprs)
+	samples <- colnames(expr@assayData$exprs)
 	if (is.null(samples))
 		stop("No sample names")
 	samples <- paste(samples, collapse = "\t")
 	cat("\nsampleNames: ", samples, "\n", sep = "")
 
-	genes <- row.names(attributes(expr)$exprs)
+	genes <- rownames(expr@assayData$exprs)
 	if (is.null(genes))
 		stop("No gene names")
 	genes <- paste(genes, collapse = "\t")

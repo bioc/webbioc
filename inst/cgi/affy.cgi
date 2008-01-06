@@ -129,7 +129,7 @@ sub step2 {
 		     td(popup_menu('custom', ['avgdiff', 'liwong', 'mas', 'medianpolish', 'playerout'], 'medianpolish'))),
 		  '</table></ul>',
 		  p($cgi->checkbox('log2trans','checked','YES','Log base 2 transform the results (required for multtest)')),
-		  p($cgi->checkbox('fmcopy','checked','YES','Copy exprSet back to the upload manager for further analysis')),
+		  p($cgi->checkbox('fmcopy','checked','YES','Copy ExpressionSet back to the upload manager for further analysis')),
 		  p("E-mail address where you would like your job status sent: (optional)", br(), textfield('email', '', 40)),
 	      p(submit("Submit Job")),
 	      end_form;
@@ -194,7 +194,7 @@ sub step3 {
 	$output = <<END;
 <h3>Output Files:</h3>
 <a href="$jobname.txt">$jobname.txt</a><br>
-<a href="$jobname.exprSet">$jobname.exprSet</a><br>
+<a href="$jobname.ExpressionSet">$jobname.ExpressionSet</a><br>
 END
 	
 	$args = "";
@@ -308,13 +308,13 @@ END
 
     # Output results
 	$script .= <<END;
-save(exprset, file = "$RESULT_DIR/$jobname/$jobname.exprSet")
+save(exprset, file = "$RESULT_DIR/$jobname/$jobname.ExpressionSet")
 write.table(exprs(exprset), "$RESULT_DIR/$jobname/$jobname.txt", quote = FALSE, 
             sep = "\t", col.names = sampleNames(exprset))
 END
 
 	$script .= $fmcopy ? <<END : "";
-save(exprset, file = "$celpath/$jobname.exprSet")
+save(exprset, file = "$celpath/$jobname.ExpressionSet")
 END
 
 	return $script;

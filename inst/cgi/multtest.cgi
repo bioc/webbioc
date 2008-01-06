@@ -99,10 +99,10 @@ multiple testing procedure selectivity plot.
 </p>
 
 <p>
-To get started with multtest, you must have a pre-existing exprSet
+To get started with multtest, you must have a pre-existing ExpressionSet
 in the upload manager. affy will create one and will place it back
 into the upload manager for you. Additionally, you may upload an
-exprSet of your own creation. It must be saved in an R data file
+ExpressionSet of your own creation. It must be saved in an R data file
 and be the only object in that file. It may have any name you wish.
 </p>
 END
@@ -124,7 +124,7 @@ sub step2 {
 	      start_form, 
 	      hidden('token', $fm->token),
 	      hidden(-name=>'step', -default=>2, -override=>1),
-	      p("Select an exprSet for analysis:"),
+	      p("Select an ExpressionSet for analysis:"),
 	      p(scrolling_list('file', \@filenames)),
 	      p('Enter number of experimental classes:', textfield('numclasses', 2, 10)),
 	      p(submit("Next Step")),
@@ -152,13 +152,13 @@ sub step3 {
 	my @filenames = $fm->filenames;
 	my ($name, @sampleNames, $annotation, $err);
 	
-	error('Please select an exprSet.') if !$filename;
+	error('Please select an ExpressionSet.') if !$filename;
 	error('File not found.') if !$fm->file_exists($filename);
 	if (grep(/[^0-9]|^$/, $numclasses) || !($numclasses > 0)) {
 	    error('Please enter an integer greater than 0.');
 	}
 	
-	$err = parse_exprSet($fm->path . "/$filename", \$name, \@sampleNames, 0, \$annotation);
+	$err = parse_ExpressionSet($fm->path . "/$filename", \$name, \@sampleNames, 0, \$annotation);
 	error($err) if $err;
 
 	print $cgi->header;    
@@ -375,7 +375,7 @@ classlabel <- as.integer(classlabel[cols])
 X <- exprs(exprset)[,cols]
 selected <- geneNames(exprset) %in% genenames
 if (!sum(selected) && !is.null(genenames))
-    stop("None of the entered gene names were found in the exprSet.")
+    stop("None of the entered gene names were found in the ExpressionSet.")
 if (!sum(selected))
     selected <- !selected
 mtdata <- mt.wrapper(proc, X[selected,,drop=F], classlabel, test, rawpcalc, side)
