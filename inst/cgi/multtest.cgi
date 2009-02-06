@@ -373,7 +373,7 @@ library(qvalue)
 cols <- which(classlabel != "Ignore")
 classlabel <- as.integer(classlabel[cols])
 X <- exprs(exprset)[,cols]
-selected <- geneNames(exprset) %in% genenames
+selected <- featureNames(exprset) %in% genenames
 if (!sum(selected) && !is.null(genenames))
     stop("None of the entered gene names were found in the ExpressionSet.")
 if (!sum(selected))
@@ -396,7 +396,7 @@ if (limit) {
 	    stop("Specified limit produces no results.")
 }
 mtdata <- mtdata[lim,,drop=F]
-row.names(mtdata) <- geneNames(exprset)[which(selected)[index[lim]]]
+row.names(mtdata) <- featureNames(exprset)[which(selected)[index[lim]]]
 mtdata <- mtdata[2:4]
 colnames(mtdata) <- c(paste(test, "statistic"), "raw p-value", 
                       paste(proc, "-value", sep = ""))
