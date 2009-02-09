@@ -81,7 +81,7 @@ mt.wrapper(proc, X, classlabel, test="t", rawpcalc="Parametric", side="abs", ...
     the discreteness of the permutation distribution. Values in
     \code{plower} are ordered according to \code{index}.}
   }
-}
+
 
 \author{Colin A. Smith \email{webbioc@colinsmith.org}}
 \keyword{ file }
