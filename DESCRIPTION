@@ -1,5 +1,5 @@
 Package: webbioc
-Version: 1.17.0
+Version: 1.17.1
 Date: 2009-02-05
 Title: Bioconductor Web Interface
 Author: Colin A. Smith <webbioc@colinsmith.org>
@@ -11,7 +11,7 @@ Description: An integrated web interface for doing microarray analysis
         be deployed as a centralized bioinformatics resource for use
         by many users. (Currently only Affymetrix oligonucleotide
         analysis is supported.)
-License: GPL version 2 or newer
+License: GPL (>= 2)
 URL: http://www.bioconductor.org/
 LazyLoad: yes
 biocViews: Infrastructure, Microarray, OneChannel, DifferentialExpression
