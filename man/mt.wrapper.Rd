@@ -70,10 +70,12 @@ mt.wrapper(proc, X, classlabel, test="t", rawpcalc="Parametric", side="abs", ...
   \item{teststat}{Vector of test statistics, ordered according to
     \code{index}.  To get the test statistics in the original data
     order, use \code{teststat[order(index)]}.}
-  \item{rawp}{Vector of raw (unadjusted) \eqn{p}-values, ordered according to \code{index}.}
-  \item{adjp}{Vector of adjusted \eqn{p}-values, ordered according to \code{index}.}
-  \item{plower}{For \code{\link[multtest]{mt.minP}} function only, vector of
-    "adjusted \eqn{p}-values", where ties in the permutation
+  \item{rawp}{Vector of raw (unadjusted) \eqn{p}-values, ordered
+  according to \code{index}.} 
+  \item{adjp}{Vector of adjusted \eqn{p}-values, ordered according to
+  \code{index}.} 
+  \item{plower}{For \code{\link[multtest:mt.maxT]{mt.minP}} function
+     only, vector of "adjusted \eqn{p}-values", where ties in the permutation
     distribution of the successive minima of raw \eqn{p}-values
     with the observed \eqn{p}-values are counted only once. Note
     that procedures based on \code{plower} do not control the FWER.
