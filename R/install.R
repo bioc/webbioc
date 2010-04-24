@@ -1,8 +1,6 @@
 installReps <- function(repNames = "aData", lib = .libPaths()[1], 
                         type = getOption("pkgType")) {
 
-    library("Biobase")
-    
     cat("Using library path: ", lib, "\n", sep = "")
     
     for (repName in repNames) {
