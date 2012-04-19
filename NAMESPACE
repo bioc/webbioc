@@ -1,4 +1,3 @@
-importFrom(Biobase, biocReposList)
 importFrom(multtest, mt.maxT, mt.minP, mt.rawp2adjp, mt.teststat)
 importFrom(qvalue, qvalue)
 importFrom(stats, pf, pt, pwilcox, sd)
