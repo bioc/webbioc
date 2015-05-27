@@ -2,8 +2,8 @@ Package: webbioc
 Version: 1.41.0
 Date: 2009-02-05
 Title: Bioconductor Web Interface
-Author: Colin A. Smith <webbioc@colinsmith.org>
-Maintainer: Colin A. Smith <webbioc@colinsmith.org>
+Author: Colin A. Smith <colin@colinsmith.org>
+Maintainer: Colin A. Smith <colin@colinsmith.org>
 Depends: R (>= 1.8.0), Biobase, affy, multtest, annaffy, vsn, gcrma, qvalue
 Imports: multtest, qvalue, stats, utils, BiocInstaller
 SystemRequirements: Unix, Perl (>= 5.6.0), Netpbm
